@@ -26,6 +26,7 @@ library(stringr)
 library(plotly)
 library(ggplot2)
 library(tidytext)
+library(leaflet)
 
 
 # Setting up the credentials inorder to call Twitter API.
@@ -78,7 +79,7 @@ clean_tweets = function(tweet)
   tweet = gsub('\\d+', '', tweet)
   return(tweet)
 }
-# combining the information extracted from the user and the tweets.
+# Combining the information extracted from the user and the tweets.
 combine_tweet_and_userInfo <- function(tweet_obj){
  
   user_info <- lookupUsers(tweet_obj$t_df$screenName)
@@ -91,7 +92,7 @@ combine_tweet_and_userInfo <- function(tweet_obj){
   return (tweet_df)
    
 } 
-# get Number of tweets per hour
+# Get Number of tweets per hour.
 tweets_per_hour <- function(tweet_df){
 
   tweet_df <- tweet_df %>% 
@@ -115,6 +116,8 @@ tweets_per_hour <- function(tweet_df){
   
   plot_tph %>% ggplotly()
 }
+
+# create tag cloud corresponding to the most frequent tweets.
 most_frequent_Cloud <- function(tweet_df){
   
 tokens <- data_frame(text = tweet_df$text) %>%
@@ -145,11 +148,23 @@ tweet_df <- tweet_df %>%
   dplyr::select(-c(text))%>% 
   mutate(text = filter_tweets)
 
-## plot number of tweets per day.
+## Plot number of tweets per day.
 tweets_per_hour(tweet_df)
 
-## plot tag-Cloud corresponding to words having highest frequency.
+## Plot tag-Cloud corresponding to words having highest frequency.
 most_frequent_Cloud(tweet_df)
+
+
+#security_info_geo.sf <- st_as_sf(security_info_geo , coords = c("lng", "lat"), crs = "+proj=longlat +datum=WGS84 +ellps=WGS84")
+
+location_new  <- tweet_df %>% 
+  filter(is.na(location) == FALSE & location != "") %>% 
+  dplyr::count(location, sort = TRUE) %>% 
+  slice(1:20)
+
+
+
+
 
 
 
