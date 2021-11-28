@@ -27,6 +27,11 @@ library(plotly)
 library(ggplot2)
 library(tidytext)
 library(leaflet)
+library(exploratory)
+library(sentimentr)
+library(devtools)
+library(gofastr)
+
 
 
 # Setting up the credentials inorder to call Twitter API.
@@ -48,7 +53,7 @@ TwitterClient <- function(search_string,no_of_tweets){
   return(list(t_str= MTweets,t_df = df))
 }
 
-## Cleaning the tweets 
+## Cleaning the tweets.
 
 clean_tweets = function(tweet)
 {
@@ -128,7 +133,20 @@ tokens <- data_frame(text = tweet_df$text) %>%
 hashtags <- data.frame(word = tokens$word,freq= tokens$n)
 hashtags <- hashtags[which(hashtags$freq > 30),] 
 wordcloud(words = hashtags$word,freq=hashtags$freq,min.freq=1,max.words=100,random.order=FALSE,rot.per=0.35,colors=brewer.pal(8,"Dark2"))
-
+}
+# visualize the sentiments of the tweet based n.
+visualize_sentiments <- function(tweet_sentiment) {
+  sentiment_graph = plot_ly(
+    x=tweet_sentiment$word_count,y=tweet_sentiment$ave_sentiment,
+    mode="markers",
+    colors =c("red","yellow"),size=abs(tweet_sentiment$ave_sentiment)/3,
+    color=ifelse(tweet_sentiment$ave_sentiment>0,"Positive","Negative")
+  ) %>%
+    layout(
+      hovermode="closest",title="Sentiment analysis by Tweet",
+      xaxis= list(title = "Number of words per Tweet",size=18),
+      yaxis = list(title = "Sentiments by Tweet",size=18)
+    )
 }
 
 ## API call-out to get all the tweets belonging to a particular hash-tag.
@@ -154,13 +172,26 @@ tweets_per_hour(tweet_df)
 ## Plot tag-Cloud corresponding to words having highest frequency.
 most_frequent_Cloud(tweet_df)
 
+## Plot the sentiment of the tweet based on its polarity.
 
-#security_info_geo.sf <- st_as_sf(security_info_geo , coords = c("lng", "lat"), crs = "+proj=longlat +datum=WGS84 +ellps=WGS84")
+sentiments_df <- sentiment_attributes(tweet_df$text)
+new_2 <- get_sentences(tweet_df$text)
+tweet_sentiment <- sentiment_by(new_2, averaging.function = average_weighted_mixed_sentiment)
+
+visualize_sentiments(tweet_sentiment)
+
+## Plot the sentiment of the tweet (Negative polarity).
+
+
 
 location_new  <- tweet_df %>% 
   filter(is.na(location) == FALSE & location != "") %>% 
   dplyr::count(location, sort = TRUE) %>% 
   slice(1:20)
+
+
+
+
 
 
 
