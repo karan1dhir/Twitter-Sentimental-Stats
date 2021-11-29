@@ -147,6 +147,31 @@ visualize_sentiments <- function(tweet_sentiment) {
       xaxis= list(title = "Number of words per Tweet",size=18),
       yaxis = list(title = "Sentiments by Tweet",size=18)
     )
+  sentiment_graph
+}
+## visualize the negative sentiment of the tweet.
+visualize_negative_sentiment <- function(negative){
+negative_sentiment_graph = plot_ly(
+  x=negative$word_count,y=negative$ave_sentiment,
+  mode="markers") %>%
+  layout(
+    hovermode="closest",title= "Negatives",
+    xaxis= list(title = "Number of words per Tweet",size=18),
+    yaxis = list(title = "Ave_Sentiments",size=18)
+  )
+negative_sentiment_graph
+}
+# visualize the positive sentiment of the tweet.
+visualize_postitive_sentiment <- function(positive){
+positive_sentiment_graph = plot_ly(
+  x=positive$word_count,y=positive$ave_sentiment,
+  mode="markers") %>%
+  layout(
+    hovermode="closest",title= "Positives",
+    xaxis= list(title = "Number of words per Tweet",size=18),
+    yaxis = list(title = "Ave_Sentiments",size=18)
+  )
+positive_sentiment_graph
 }
 
 ## API call-out to get all the tweets belonging to a particular hash-tag.
@@ -160,7 +185,6 @@ tweet_df <- combine_tweet_and_userInfo(tweet_obj)
 
 ## Clean all the tweets by removing all the punctuation, stop words, links http, tabs, blank spaces.
 filter_tweets <- clean_tweets(tweet_df$text)  
-
 
 tweet_df <- tweet_df %>% 
   dplyr::select(-c(text))%>% 
@@ -178,16 +202,34 @@ sentiments_df <- sentiment_attributes(tweet_df$text)
 new_2 <- get_sentences(tweet_df$text)
 tweet_sentiment <- sentiment_by(new_2, averaging.function = average_weighted_mixed_sentiment)
 
+
 visualize_sentiments(tweet_sentiment)
 
 ## Plot the sentiment of the tweet (Negative polarity).
 
+negative_sentiment <- filter(tweet_sentiment,ave_sentiment < 0)
+positive_sentiment <- filter(tweet_sentiment,ave_sentiment > 0)
+
+visualize_negative_sentiment(negative_sentiment)
+visualize_postitive_sentiment(positive_sentiment)
 
 
+# Plotting the map based on the tweets collected from the different regions.
 location_new  <- tweet_df %>% 
   filter(is.na(location) == FALSE & location != "") %>% 
   dplyr::count(location, sort = TRUE) %>% 
   slice(1:20)
+
+
+## Making Machine learning model for the prediction of the tweets.
+tweet_df$sentiment_score <- tweet_sentiment$ave_sentiment
+tweet_df$negative <- as.factor(tweet_df$sentiment_score <= -1)
+tweet_df$positive <- as.factor(tweet_df$sentiment_score >= 1)
+
+
+
+
+
 
 
 
