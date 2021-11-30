@@ -214,7 +214,7 @@ visualize_negative_sentiment(negative_sentiment)
 visualize_postitive_sentiment(positive_sentiment)
 
 
-# Plotting the map based on the tweets collected from the different regions.
+# Plotting the map based on the tweets collected from the different regions etc.
 location_new  <- tweet_df %>% 
   filter(is.na(location) == FALSE & location != "") %>% 
   dplyr::count(location, sort = TRUE) %>% 
