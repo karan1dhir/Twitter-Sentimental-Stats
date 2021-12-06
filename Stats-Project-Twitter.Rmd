@@ -2,7 +2,7 @@
 title: "Twitter-Sentimental-Analysis"
 author: "Karan Dhir"
 date: "27/11/2021"
-output:
+output: 
   pdf_document: default
   latex_engine: xelatex
 ---
@@ -235,7 +235,7 @@ show_countries_map <- function(tweet_df) {
   location_filtered <-
     as.data.frame(sapply(location_all, grepl, pattern = ",", fixed = TRUE))
   location_new <-
-    location_all[location_filtered$location == TRUE, ] %>% slice(1:10)
+    location_all[location_filtered$location == TRUE,] %>% slice(1:10)
   
   lat <-
     c(
@@ -286,10 +286,10 @@ show_countries_map <- function(tweet_df) {
   )
   
   leaflet(location_df) %>% addTiles() %>%
-    addAwesomeMarkers( ~ long,
-                       ~ lat,
-                       icon = icons,
-                       label = (location_df$location_new.n))
+    addAwesomeMarkers(~ long,
+                      ~ lat,
+                      icon = icons,
+                      label = (location_df$location_new.n))
 }
 
 ## API call-out to get all the tweets belonging to a particular hash-tag.
