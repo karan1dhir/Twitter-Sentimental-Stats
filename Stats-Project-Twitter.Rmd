@@ -31,6 +31,11 @@ library(exploratory)
 library(sentimentr)
 library(devtools)
 library(gofastr)
+library(tm)
+library(caTools)
+library(rpart)
+library(rpart.plot)
+
 
 
 
@@ -174,6 +179,42 @@ positive_sentiment_graph = plot_ly(
 positive_sentiment_graph
 }
 
+#visualize those countries on map having heighest frequency of tweets.
+# Since google api is paid so hard-coding the latitudes and longitudes of the countries.
+show_countries_map <- function(tweet_df){
+  location_all  <- tweet_df %>% 
+  filter(is.na(location) == FALSE & location != "") %>% 
+  dplyr::count(location, sort = TRUE)
+  
+  location_filtered <- as.data.frame(sapply(location_new, grepl, pattern = ",", fixed = TRUE))
+  location_new <- location_all[location_filtered$location == TRUE,] %>% slice(1:10)
+  
+lat <- c(0.347596,37.0902,35.3395,40.7128,37.9060,52.5200,45.4869,36.9741,37.0902,37.0902)
+long <- c(32.582520,95.7129,97.4867,74.0060,122.5450,13.4050,122.8040,122.0308,95.7129,95.7129)
+location_df <- data.frame(location_new$location,location_new$n, lat, long)
+
+getColor <- function(location_df) {
+  sapply(location_df$n, function(n) {
+  if(n <= 60) {
+    "green"
+  } else if(n <= 80) {
+    "orange"
+  } else {
+    "red"
+  } })
+}
+
+icons <- awesomeIcons(
+  icon = 'ios-close',
+  iconColor = 'black',
+  library = 'ion',
+  markerColor = getColor(location_df)
+)
+
+leaflet(location_df) %>% addTiles() %>%
+  addAwesomeMarkers(~long, ~lat, icon=icons,label = (location_df$location_new.n))
+}
+
 ## API call-out to get all the tweets belonging to a particular hash-tag.
 searchString <- "#globalwarming"
 no_of_tweets <- 3500
@@ -215,30 +256,7 @@ visualize_postitive_sentiment(positive_sentiment)
 
 
 # Plotting the map based on the tweets collected from the different regions etc.
-location_new  <- tweet_df %>% 
-  filter(is.na(location) == FALSE & location != "") %>% 
-  dplyr::count(location, sort = TRUE) %>% 
-  slice(1:20)
-
-
-## Making Machine learning model for the prediction of the tweets.
-tweet_df$sentiment_score <- tweet_sentiment$ave_sentiment
-tweet_df$negative <- as.factor(tweet_df$sentiment_score <= -1)
-tweet_df$positive <- as.factor(tweet_df$sentiment_score >= 1)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+show_countries_map(tweet_df)
 
 
 ```
