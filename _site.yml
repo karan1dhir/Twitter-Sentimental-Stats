@@ -1,0 +1,6 @@
+name: "Stats-Project"
+navbar:
+  title: "Twitter-Sentimental-Analysis"
+  left:
+    - text: "Home"
+      href: index.html
