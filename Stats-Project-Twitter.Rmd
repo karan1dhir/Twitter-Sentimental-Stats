@@ -1,5 +1,5 @@
 ---
-title: "Stats-Project"
+title: "Twitter-Sentimental-Analysis"
 author: "Karan Dhir"
 date: "27/11/2021"
 output:
@@ -62,7 +62,8 @@ TwitterClient <- function(search_string, no_of_tweets) {
   return(list(t_str = MTweets, t_df = df))
 }
 
-## Cleaning the tweets removing all the punctuations, digits, stopwords, extra spaces and special characters.
+## Cleaning the tweets removing all the punctuation, digits, stop words, extra spaces and 
+## special characters.
 #' @param tweet - textual part of the tweet.
 #' @return The list of tweets.
 clean_tweets = function(tweet)
